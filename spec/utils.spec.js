@@ -142,3 +142,63 @@ describe("makeRefObj", () => {
     expect(makeRefArray).to.deep.equal([{ article_id: 1, title: "A" }]);
   });
 });
+
+describe("formatComments", () => {
+  it("Returns an empty array if given an empty array", () => {
+    const comments = [];
+    expect(formatComments(comments)).to.eql([]);
+  });
+
+  it("Returns ONE FORMATTED OBJECT when given ONE object in array", () => {
+    const comments = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      }
+    ];
+    refObject = makeRefObj([
+      { article_id: 1, title: "They're not exactly dogs, are they?" }
+    ]);
+    expect(formatComments(comments, refObject)).to.eql([
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        votes: 16,
+        created_at: new Date(1511354163389),
+        author: "butter_bridge",
+        article_id: 1
+      }
+    ]);
+  });
+
+  it("DOES NOT mutate the original object", () => {
+    const comments = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      }
+    ];
+    refObject = makeRefObj([
+      { article_id: 1, title: "They're not exactly dogs, are they?" }
+    ]);
+    formatComments(comments, refObject);
+    expect(comments).to.deep.equal([
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      }
+    ]);
+  });
+});
