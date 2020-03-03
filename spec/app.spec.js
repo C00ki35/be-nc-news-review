@@ -322,3 +322,175 @@ describe("ARTICLES - POST", () => {
     return Promise.all(methodPromises);
   });
 });
+
+describe("ARTICLES/COMMENTS - GET", () => {
+  it("Status:200 - Array of comments for the given article_id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(typeof comments).to.equal("object");
+      });
+  });
+  it("Status:200 - Array of comments for article_id 1 to equal 13", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).to.equal(13);
+      });
+  });
+
+  it("Status:200 - Array of all comments for article id 1 sorted by AUTHOR", () => {
+    return request(app)
+      .get("/api/articles/1/comments?sort_by=author")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).to.be.sortedBy("author", {
+          ascending: true
+        });
+      });
+  });
+
+  it("Status:200 - Array of all comments for  article id 1 sorted by AUTHOR DESC", () => {
+    return request(app)
+      .get("/api/articles/1/comments?sort_by=author&order=desc")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).to.be.sortedBy("author", {
+          descending: true
+        });
+      });
+  });
+
+  it("Status:200 - Array of all comments for  article id 1 sorted by CREATED_AT ASC by default", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).to.be.sortedBy("created_at", {
+          ascending: true
+        });
+      });
+  });
+
+  it("Status:400 - Bad Request - non valid sort_by", () => {
+    return request(app)
+      .get("/api/articles/1/comments?sort_by=Turkey")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.eql("Status 400: Bad request");
+      });
+  });
+
+  it("Status:400 - 'Test' given as :article_id number", () => {
+    return request(app)
+      .post("/api/articles/Test/comments")
+      .send({ username: "grumpy19", comment: "Eye-swirling naffness!" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Status 400: Bad request");
+      });
+  });
+
+  xit("Status:404 - Valid datatype but resource non-existant", () => {
+    return request(app)
+      .get("/api/articles/40404040/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Not Found.");
+      });
+  });
+});
+
+describe("ALL ARTICLES - GET", () => {
+  it("Status:200 - Array of all articles, includes comment count & Date descending", () => {
+    return request(app)
+      .get("/api/articles/")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).to.be.sortedBy("created_at", {
+          descending: true
+        });
+      });
+  });
+
+  it("Status:200 - Array of all articles sorted by TITLE DESC", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).to.be.sortedBy("title", {
+          descending: true
+        });
+      });
+  });
+
+  it("Status:200 - Array of all articles sorted by TITLE ASC", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).to.be.sortedBy("title", {
+          ascending: true
+        });
+      });
+  });
+
+  it("Status:200 - Article to contains keys - author, votes & body", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments[0]).to.contain.keys("author", "votes", "body");
+      });
+  });
+
+  it("Status 200 - Filter articles array by author", () => {
+    return request(app)
+      .get("/api/articles?author=butter_bridge")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).to.equal(3);
+      });
+  });
+
+  it("Status 200 - Filter articles array by topic (cats)", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).to.equal(1);
+      });
+  });
+
+  it("Status:400 - Bad request / 'test' given as :article_id number", () => {
+    return request(app)
+      .post("/api/articles/test/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Status 400: Bad request");
+      });
+  });
+
+  it("Status:400  - Sort_by 'yello'", () => {
+    return request(app)
+      .get("/api/articles?sort_by=yello&order=asc")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Status 400: Bad request");
+      });
+  });
+
+  it("Status:400  - Order not asc/desc", () => {
+    return request(app)
+      .get("/api/articles?sort_by=yello&order=boots")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Status 400: Bad request");
+      });
+  });
+});
+
+describe("COMMENTS - PATCH", () => {});
+describe("COMMENTS - DELETE", () => {});

@@ -1,7 +1,9 @@
 const {
   fetchArticle,
   fetchPatchedArticle,
-  postCommentToArticle
+  postCommentToArticle,
+  fetchComments,
+  fetchAllArticlesWithComments
 } = require("../models/articleModels");
 
 exports.getArticle = (req, res, next) => {
@@ -45,4 +47,23 @@ exports.getArticleToCommentOn = (req, res, next) => {
     .catch(err => {
       next(err);
     });
+};
+
+exports.getAllCommentsOnArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  const { sort_by, order } = req.query;
+  fetchComments(article_id, sort_by, order)
+    .then(response => {
+      res.status(200).send({ comments: response });
+    })
+    .catch(next);
+};
+
+exports.getAllArticlesWithComments = (req, res, next) => {
+  const { sort_by, order, author, topic } = req.query;
+  fetchAllArticlesWithComments(sort_by, order, author, topic)
+    .then(articles => {
+      res.status(200).send({ articles });
+    })
+    .catch(next);
 };

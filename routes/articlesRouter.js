@@ -5,7 +5,9 @@ const { error405 } = require("../errors");
 const {
   getArticle,
   getArticleToPatch,
-  getArticleToCommentOn
+  getArticleToCommentOn,
+  getAllCommentsOnArticle,
+  getAllArticlesWithComments
 } = require("../controllers/articlesController");
 
 articlesRouter
@@ -17,6 +19,12 @@ articlesRouter
 articlesRouter
   .route("/:article_id/comments")
   .post(getArticleToCommentOn)
+  .get(getAllCommentsOnArticle)
+  .all(error405);
+
+articlesRouter
+  .route("/")
+  .get(getAllArticlesWithComments)
   .all(error405);
 
 module.exports = articlesRouter;
