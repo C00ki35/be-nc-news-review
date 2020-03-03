@@ -15,7 +15,9 @@ exports.getArticle = (req, res, next) => {
         res.status(200).send({ article: article[0] });
       }
     })
-    .catch(next);
+    .catch(err => {
+      next(err);
+    });
 };
 
 exports.getArticleToPatch = (req, res, next) => {
