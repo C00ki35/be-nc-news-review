@@ -128,10 +128,10 @@ describe("ARTICLES - GET", () => {
 
   it("Status:404 - /api/articles/rainbow.", () => {
     return request(app)
-      .get("/api/articleers/rainbow")
-      .expect(404)
+      .get("/api/articles/rainbow")
+      .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).to.equal("Not Found.");
+        expect(msg).to.equal("Status 400: Bad request");
       });
   });
 
@@ -236,6 +236,84 @@ describe("ARTICLES - PATCH", () => {
     const methodPromises = incorrectMethods.map(method => {
       return request(app)
         .post("/api/topics")
+        .expect(405)
+        .then(({ body: { message } }) => {
+          expect(message).to.equal("Status: 405 Method not allowed");
+        });
+    });
+    return Promise.all(methodPromises);
+  });
+});
+
+describe("ARTICLES - POST", () => {
+  it("Status:201 - Post a comment to article_id 1 - returns object with key of 'comment'", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "rogersop",
+        comment: "This comment goes without saying..."
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body).to.be.an("object");
+      });
+  });
+
+  it("Status:201 - Object to include 'body, author and votes' keys.", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "rogersop", comment: "Eye-swirling naffness!" })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).to.contain.keys("body", "author", "votes");
+      });
+  });
+
+  it("Status:201 - Comment to be 'Here today gone today.'", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "rogersop", comment: "Here today gone today." })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment.body).to.eql("Here today gone today.");
+      });
+  });
+
+  it("Status:400 - Empty object if nothing in the given object", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({})
+      .expect(400)
+      .then(response => {
+        expect(response.body.msg).to.equal("Status 400: Bad request");
+      });
+  });
+
+  it("Status:400 - Incorrect number of keys in post object", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ comment: "This won't work!" })
+      .expect(400)
+      .then(response => {
+        expect(response.body.msg).to.equal("Status 400: Bad request");
+      });
+  });
+
+  it("Status:400 - wrong data type", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ vlotes: 1 })
+      .expect(400)
+      .then(response => {
+        expect(response.body.msg).to.equal("Status 400: Bad request");
+      });
+  });
+
+  it("Status:405 - PUT/DELETE/PATCH - Incorrect method", () => {
+    const incorrectMethods = ["delete"];
+    const methodPromises = incorrectMethods.map(method => {
+      return request(app)
+        .delete("/api/articles/3")
         .expect(405)
         .then(({ body: { message } }) => {
           expect(message).to.equal("Status: 405 Method not allowed");

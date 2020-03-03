@@ -1,10 +1,12 @@
 const {
   fetchArticle,
-  fetchPatchedArticle
+  fetchPatchedArticle,
+  postCommentToArticle
 } = require("../models/articleModels");
 
 exports.getArticle = (req, res, next) => {
   const { article_id } = req.params;
+
   fetchArticle(article_id)
     .then(article => {
       if (article[0] === undefined) {
@@ -31,4 +33,16 @@ exports.getArticleToPatch = (req, res, next) => {
       res.status(200).send({ article: article[0] });
     })
     .catch(next);
+};
+
+exports.getArticleToCommentOn = (req, res, next) => {
+  const { article_id } = req.params;
+  const { username, comment } = req.body;
+  postCommentToArticle(article_id, username, comment)
+    .then(addedComments => {
+      res.status(201).send({ comment: addedComments[0] });
+    })
+    .catch(err => {
+      next(err);
+    });
 };

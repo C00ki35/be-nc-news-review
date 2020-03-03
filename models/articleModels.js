@@ -30,3 +30,10 @@ exports.fetchPatchedArticle = (article_id, inc_votes) => {
     })
     .returning("*");
 };
+
+exports.postCommentToArticle = (article_id, username, comment) => {
+  return connection("comments")
+    .insert([{ body: comment, author: username, article_id }])
+    .where("article_id", "=", article_id)
+    .returning("*");
+};
