@@ -50,3 +50,41 @@ describe("TOPICS - GET", () => {
     return Promise.all(methodPromises);
   });
 });
+
+describe("USERS - GET", () => {
+  it.only("Status:200 - ONE object containing user info", () => {
+    return request(app)
+      .get("/api/users/rogersop")
+      .expect(200)
+      .then(response => {
+        expect(response.body).to.eql({
+          user: {
+            username: "rogersop",
+            avatar_url:
+              "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+            name: "paul"
+          }
+        });
+      });
+  });
+  it("Status:404 - Not Found - username 'whatever", () => {
+    return request(app)
+      .get("/api/usors/whatever")
+      .expect(404)
+      .then(response => {
+        expect(response.body.msg).to.equal("Not Found.");
+      });
+  });
+  it("Status:405 - PUT/DELETE/PATCH - Incorrect method", () => {
+    const incorrectMethods = ["put", "delete", "patch"];
+    const methodPromises = incorrectMethods.map(method => {
+      return request(app)
+        .post("/api/topics")
+        .expect(405)
+        .then(({ body: { message } }) => {
+          expect(message).to.equal("Status: 405 Method not allowed");
+        });
+    });
+    return Promise.all(methodPromises);
+  });
+});
