@@ -46,7 +46,10 @@ exports.fetchComments = (article_id, sort_by = "created_at", order = "asc") => {
     .orderBy(sort_by, order)
     .then(response => {
       if (response.length === 0) {
-        return Promise.reject({ status: 404, msg: "Path does not exist" });
+        return Promise.reject({
+          status: 404,
+          msg: "Valid article number but not found."
+        });
       } else {
         return response;
       }

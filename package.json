@@ -14,7 +14,8 @@
     "seed": "knex seed:run",
     "migrate-latest": "knex migrate:latest",
     "migrate-rollback": "knex migrate:rollback",
-    "app-test": "mocha spec/app.spec.js"
+    "app-test": "mocha spec/app.spec.js",
+    "find-logs": "grep -R --line-number console.log ./ --exclude-dir node_modules"
   },
   "repository": {
     "type": "git",

@@ -281,7 +281,37 @@ describe("ARTICLES - POST", () => {
       });
   });
 
-  it("Status:400 - BAD REQUEST / Empty object if nothing in the given object", () => {
+  it("Status:400 - BAD REQUEST / Post to non-existant article", () => {
+    return request(app)
+      .post("/api/articles/800/comments")
+      .send({
+        username: "rogersop",
+        comment: "This comment goes without saying..."
+      })
+      .expect(400)
+      .then(response => {
+        expect(response.body.msg).to.equal(
+          "Status 400: Article does not exist"
+        );
+      });
+  });
+
+  it("Status:400 - BAD REQUEST / username non-existant", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "RogerRabbit",
+        comment: "This comment goes without saying..."
+      })
+      .expect(400)
+      .then(response => {
+        expect(response.body.msg).to.equal(
+          "Status 400: Article does not exist"
+        );
+      });
+  });
+
+  it("Status:400 - BAD REQUEST / Empty object sent", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({})
@@ -308,7 +338,7 @@ describe("ARTICLES - POST", () => {
   it("Status:400 - BAD REQUEST / wrong data type", () => {
     return request(app)
       .post("/api/articles/1/comments")
-      .send({ vlotes: 1 })
+      .send({ usorNamed: "bill" })
       .expect(400)
       .then(response => {
         expect(response.body.msg).to.equal(
@@ -401,17 +431,26 @@ describe("ARTICLES/COMMENTS - GET", () => {
       });
   });
 
-  xit("Status:404 - NOT FOUND / Valid datatype but resource non-existant", () => {
+  it("Status:404 - NOT FOUND / Valid datatype but resource non-existant", () => {
     return request(app)
       .get("/api/articles/40404040/comments")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).to.equal("Not Found.");
+        expect(msg).to.equal("Valid article number but not found.");
       });
   });
 });
 
 describe("ALL ARTICLES - GET", () => {
+  it("Status:200 - Returns an array of articles", () => {
+    return request(app)
+      .get("/api/articles/")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).to.be.an("array");
+      });
+  });
+
   it("Status:200 - Array of all articles, includes comment count & Date descending", () => {
     return request(app)
       .get("/api/articles/")
@@ -481,7 +520,7 @@ describe("ALL ARTICLES - GET", () => {
       });
   });
 
-  it("Status:400  - BAD REQUEST / Sort_by 'yello'", () => {
+  it("Status:400 - BAD REQUEST / Sort_by 'yello'", () => {
     return request(app)
       .get("/api/articles?sort_by=yello&order=asc")
       .expect(400)
@@ -490,7 +529,7 @@ describe("ALL ARTICLES - GET", () => {
       });
   });
 
-  it("Status:400  - BAD REQUEST / Order not asc/desc", () => {
+  it("Status:400 - BAD REQUEST / Order not asc/desc", () => {
     return request(app)
       .get("/api/articles?sort_by=yello&order=boots")
       .expect(400)
@@ -546,7 +585,7 @@ describe("COMMENTS - PATCH", () => {
   });
 });
 
-describe.only("COMMENTS - DELETE", () => {
+describe("COMMENTS - DELETE", () => {
   it("Status:204 - Deletes the given comment.", () => {
     return request(app)
       .delete("/api/comments/1")

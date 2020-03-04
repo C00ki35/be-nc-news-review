@@ -21,6 +21,12 @@ app.use((err, req, res, next) => {
     res
       .status(400)
       .send({ msg: "Status 400: Bad request - Invalid data type" });
+  }
+  if (err.code === "23503") {
+    res.status(400).send({ msg: "Status 400: Article does not exist" });
+  }
+  if (err.status === 404) {
+    res.status(err.status).send({ msg: err.msg });
   } else next(err);
 });
 
