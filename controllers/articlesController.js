@@ -27,12 +27,16 @@ exports.getArticle = (req, res, next) => {
 exports.getArticleToPatch = (req, res, next) => {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
-  if (inc_votes === undefined) {
-    res.status(400).send({ msg: "Status 400: Bad request" });
-  }
+
   fetchPatchedArticle(article_id, inc_votes)
     .then(article => {
-      res.status(200).send({ article: article[0] });
+      if (inc_votes === undefined) {
+        res
+          .status(400)
+          .send({ msg: "Status 400: Bad request - Column does not exist" });
+      } else {
+        res.status(200).send({ article: article[0] });
+      }
     })
     .catch(next);
 };
@@ -56,7 +60,9 @@ exports.getAllCommentsOnArticle = (req, res, next) => {
     .then(response => {
       res.status(200).send({ comments: response });
     })
-    .catch(next);
+    .catch(err => {
+      next(err);
+    });
 };
 
 exports.getAllArticlesWithComments = (req, res, next) => {

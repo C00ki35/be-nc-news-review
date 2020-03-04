@@ -28,7 +28,7 @@ describe("TOPICS - GET", () => {
         expect(body.topics[0]).to.contain.keys("slug", "description");
       });
   });
-  it("Status:404 - /api/tropics-  path not found'", () => {
+  it("Status:404 - NOT FOUND /api/tropics-  path not found'", () => {
     return request(app)
       .get("/api/tropics")
       .expect(404)
@@ -36,7 +36,7 @@ describe("TOPICS - GET", () => {
         expect(msg).to.equal("Not Found.");
       });
   });
-  it("Status:405 - PUT/DELETE/PATCH - Incorrect method", () => {
+  it("Status:405 - BAD METHOD / PUT/DELETE/PATCH - Incorrect method", () => {
     const incorrectMethods = ["put", "delete", "patch"];
     const methodPromises = incorrectMethods.map(method => {
       return request(app)
@@ -76,7 +76,7 @@ describe("USERS - GET", () => {
       });
   });
 
-  it("Status:404 - Not Found - username 'whatever", () => {
+  it("Status:404 - NOT FOUND / username 'whatever", () => {
     return request(app)
       .get("/api/usors/whatever")
       .expect(404)
@@ -84,7 +84,7 @@ describe("USERS - GET", () => {
         expect(msg).to.equal("Not Found.");
       });
   });
-  it("Status:405 - PUT/DELETE/PATCH - Incorrect method", () => {
+  it("Status:405 - BAD METHOD / PUT/DELETE/PATCH - Incorrect method", () => {
     const incorrectMethods = ["put", "delete", "patch"];
     const methodPromises = incorrectMethods.map(method => {
       return request(app)
@@ -126,16 +126,16 @@ describe("ARTICLES - GET", () => {
       });
   });
 
-  it("Status:404 - /api/articles/rainbow.", () => {
+  it("Status:400 - BAD REQUEST / api/articles/rainbow.", () => {
     return request(app)
       .get("/api/articles/rainbow")
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).to.equal("Status 400: Bad request");
+        expect(msg).to.equal("Status 400: Bad request - Invalid data type");
       });
   });
 
-  it("Status:404 - /api/articleers - Not Found.", () => {
+  it("Status:404 - NOT FOUND / api/articleers - Not Found.", () => {
     return request(app)
       .get("/api/articleers/")
       .expect(404)
@@ -144,7 +144,7 @@ describe("ARTICLES - GET", () => {
       });
   });
 
-  it("Status:404 - Valid path but resource does not exist", () => {
+  it("Status:404 - NOT FOUND / Valid path but resource does not exist", () => {
     return request(app)
       .get("/api/articles/78585994")
       .expect(404)
@@ -155,7 +155,7 @@ describe("ARTICLES - GET", () => {
       });
   });
 
-  it("Status:405 - DELETE - Incorrect method", () => {
+  it("Status:405 - BAD METHOD / DELETE - Incorrect method", () => {
     return request(app)
       .delete("/api/articles/:article_id")
       .expect(405)
@@ -203,26 +203,28 @@ describe("ARTICLES - PATCH", () => {
         expect(article).to.contain.keys("author", "title", "topic", "votes");
       });
   });
-  it("Status:400 - Bad request body, no keys in object ie. {} ", () => {
+  it("Status:400 - BAD REQUEST / body no keys in object ie. {} ", () => {
     return request(app)
       .patch("/api/articles/1")
       .send({})
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).to.deep.equal("Status 400: Bad request");
+        expect(msg).to.deep.equal(
+          "Status 400: Bad request - Column does not exist"
+        );
       });
   });
 
-  it("Status:400 - Invalid datatype - { inc_votes: 'testing' }", () => {
+  it("Status:400 - BAD REQUEST / Invalid datatype - { inc_votes: 'testing' }", () => {
     return request(app)
       .patch("/api/articles/2")
       .send({ inc_votes: "testing" })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).to.equal("Status 400: Bad request");
+        expect(msg).to.equal("Status 400: Bad request - Invalid data type");
       });
   });
-  it("Status:404 - /api/articleers/4 - Not Found.", () => {
+  it("Status:404 - NOT FOUND / api/articleers/4 - Not Found.", () => {
     return request(app)
       .get("/api/articleers/4")
       .expect(404)
@@ -231,7 +233,7 @@ describe("ARTICLES - PATCH", () => {
       });
   });
 
-  it("Status:405 - PUT/DELETE/PATCH - Incorrect method", () => {
+  it("Status:405 - BAD METHOD / PUT/DELETE/PATCH - Incorrect method", () => {
     const incorrectMethods = ["put", "delete"];
     const methodPromises = incorrectMethods.map(method => {
       return request(app)
@@ -279,37 +281,43 @@ describe("ARTICLES - POST", () => {
       });
   });
 
-  it("Status:400 - Empty object if nothing in the given object", () => {
+  it("Status:400 - BAD REQUEST / Empty object if nothing in the given object", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({})
       .expect(400)
       .then(response => {
-        expect(response.body.msg).to.equal("Status 400: Bad request");
+        expect(response.body.msg).to.equal(
+          "Status 400: Bad request - Invalid data type"
+        );
       });
   });
 
-  it("Status:400 - Incorrect number of keys in post object", () => {
+  it("Status:400 - BAD REQUEST / Incorrect number of keys in post object", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({ comment: "This won't work!" })
       .expect(400)
       .then(response => {
-        expect(response.body.msg).to.equal("Status 400: Bad request");
+        expect(response.body.msg).to.equal(
+          "Status 400: Bad request - Invalid data type"
+        );
       });
   });
 
-  it("Status:400 - wrong data type", () => {
+  it("Status:400 - BAD REQUEST / wrong data type", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({ vlotes: 1 })
       .expect(400)
       .then(response => {
-        expect(response.body.msg).to.equal("Status 400: Bad request");
+        expect(response.body.msg).to.equal(
+          "Status 400: Bad request - Invalid data type"
+        );
       });
   });
 
-  it("Status:405 - PUT/DELETE/PATCH - Incorrect method", () => {
+  it("Status:405 - BAD METHD / PUT/DELETE/PATCH - Incorrect method", () => {
     const incorrectMethods = ["delete"];
     const methodPromises = incorrectMethods.map(method => {
       return request(app)
@@ -374,26 +382,26 @@ describe("ARTICLES/COMMENTS - GET", () => {
       });
   });
 
-  it("Status:400 - Bad Request - non valid sort_by", () => {
+  it("Status:400 - BAD REQUEST / non valid sort_by", () => {
     return request(app)
       .get("/api/articles/1/comments?sort_by=Turkey")
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).to.eql("Status 400: Bad request");
+        expect(msg).to.eql("Status 400: Bad request - Column does not exist");
       });
   });
 
-  it("Status:400 - 'Test' given as :article_id number", () => {
+  it("Status:400 - BAD REQUEST / 'Test' given as :article_id number", () => {
     return request(app)
       .post("/api/articles/Test/comments")
       .send({ username: "grumpy19", comment: "Eye-swirling naffness!" })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).to.equal("Status 400: Bad request");
+        expect(msg).to.equal("Status 400: Bad request - Invalid data type");
       });
   });
 
-  xit("Status:404 - Valid datatype but resource non-existant", () => {
+  xit("Status:404 - NOT FOUND / Valid datatype but resource non-existant", () => {
     return request(app)
       .get("/api/articles/40404040/comments")
       .expect(404)
@@ -464,33 +472,84 @@ describe("ALL ARTICLES - GET", () => {
       });
   });
 
-  it("Status:400 - Bad request / 'test' given as :article_id number", () => {
+  it("Status:400 - BAD REQUEST / 'test' given as :article_id number", () => {
     return request(app)
       .post("/api/articles/test/comments")
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).to.equal("Status 400: Bad request");
+        expect(msg).to.equal("Status 400: Bad request - Invalid data type");
       });
   });
 
-  it("Status:400  - Sort_by 'yello'", () => {
+  it("Status:400  - BAD REQUEST / Sort_by 'yello'", () => {
     return request(app)
       .get("/api/articles?sort_by=yello&order=asc")
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).to.equal("Status 400: Bad request");
+        expect(msg).to.equal("Status 400: Bad request - Column does not exist");
       });
   });
 
-  it("Status:400  - Order not asc/desc", () => {
+  it("Status:400  - BAD REQUEST / Order not asc/desc", () => {
     return request(app)
       .get("/api/articles?sort_by=yello&order=boots")
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).to.equal("Status 400: Bad request");
+        expect(msg).to.equal("Status 400: Bad request - Column does not exist");
       });
   });
 });
 
-describe("COMMENTS - PATCH", () => {});
-describe("COMMENTS - DELETE", () => {});
+describe("COMMENTS - PATCH", () => {
+  it("Status:200 - Increase article's comment vote by 1", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ votes: 1 })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment.votes).to.equal(17);
+      });
+  });
+
+  it("Status:200 - Decrease article's comment vote by 5", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ votes: -5 })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment.votes).to.equal(11);
+      });
+  });
+
+  it("Status:400 - BAD REQUEST / body, no keys in object ie. {} ", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.deep.equal(
+          "Status 400: Bad request - Invalid data type"
+        );
+      });
+  });
+
+  it("Status:400 - BAD REQUEST / body, wrong datatype.", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ votes: "test" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.deep.equal(
+          "Status 400: Bad request - Invalid data type"
+        );
+      });
+  });
+});
+
+describe.only("COMMENTS - DELETE", () => {
+  it("Status:204 - Deletes the given comment.", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204);
+  });
+});
