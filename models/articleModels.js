@@ -1,4 +1,5 @@
 const connection = require("../db/connection.js");
+const { fetchUser } = require("./userModels");
 
 exports.fetchArticle = article_id => {
   return connection
@@ -31,28 +32,32 @@ exports.fetchPatchedArticle = (article_id, inc_votes) => {
     .returning("*");
 };
 
-exports.postCommentToArticle = (article_id, username, comment) => {
+exports.postCommentToArticle = (article_id, username, body) => {
   return connection("comments")
-    .insert([{ body: comment, author: username, article_id }])
+    .insert([{ body: body, author: username, article_id }])
     .where("article_id", "=", article_id)
     .returning("*");
 };
 
-exports.fetchComments = (article_id, sort_by = "created_at", order = "asc") => {
+exports.fetchComments = (
+  article_id,
+  sort_by = "created_at",
+  order = "desc"
+) => {
   return connection
     .select("comment_id", "votes", "created_at", "author", "body")
     .from("comments")
     .where("article_id", "=", article_id)
     .orderBy(sort_by, order)
-    .then(response => {
-      if (response.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: "Valid article number but not found."
-        });
+    .then(comments => {
+      if (comments.length === 0) {
+        return Promise.all([comments, doesArticleExist(article_id)]);
       } else {
-        return response;
+        return [comments];
       }
+    })
+    .then(([comments]) => {
+      return comments;
     });
 };
 
@@ -80,19 +85,56 @@ exports.fetchAllArticlesWithComments = (
       if (author) {
         query.where("articles.author", "=", author);
       }
-    })
-    .modify(querytopic => {
       if (topic) {
-        querytopic.where("articles.topic", "=", topic);
+        query.where("articles.topic", "=", topic);
       }
     })
     .orderBy(sort, order)
-    .returning("*")
-    .then(response => {
-      if (response.length === 0) {
-        return Promise.reject();
+    .then(articles => {
+      if (articles.length === 0) {
+        if (author) {
+          return Promise.all([articles, fetchUser(author)]);
+        }
+        if (topic) {
+          return Promise.all([articles, doesTopicExist(topic)]);
+        }
       } else {
-        return response;
+        return [articles];
       }
+    })
+    .then(([articles]) => {
+      return articles;
     });
 };
+
+function doesArticleExist(article_id) {
+  return connection
+    .select("*")
+    .from("articles")
+    .where("article_id", article_id)
+    .returning("*")
+    .then(article => {
+      if (article.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Valid article number but not found."
+        });
+      }
+    });
+}
+
+function doesTopicExist(topic) {
+  return connection
+    .select("*")
+    .from("topics")
+    .where("slug", topic)
+    .returning("*")
+    .then(topic => {
+      if (topic.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Valid topic number but not found."
+        });
+      }
+    });
+}

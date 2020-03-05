@@ -5,16 +5,10 @@ const {
 
 exports.getCommentVotes = (req, res, next) => {
   const { comment_id } = req.params;
-  const { votes } = req.body;
-  patchVotesToComment(comment_id, votes)
+  const { inc_votes } = req.body;
+  patchVotesToComment(comment_id, inc_votes)
     .then(response => {
-      if (votes === undefined) {
-        res
-          .status(400)
-          .send({ msg: "Status 400: Bad request - Invalid data type" });
-      } else {
-        res.status(201).send({ comment: response[0] });
-      }
+      res.status(200).send({ comment: response[0] });
     })
     .catch(err => {
       next(err);

@@ -6,7 +6,10 @@ const {
   deleteComment
 } = require("../controllers/commentsController.js");
 
-commentsRouter.patch("/:comment_id", getCommentVotes);
-commentsRouter.delete("/:comment_id", deleteComment).all(error405);
+commentsRouter
+  .route("/:comment_id")
+  .patch(getCommentVotes)
+  .delete(deleteComment)
+  .all(error405);
 
 module.exports = commentsRouter;
