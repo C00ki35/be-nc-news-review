@@ -3,8 +3,11 @@ const {
   fetchPatchedArticle,
   postCommentToArticle,
   fetchComments,
-  fetchAllArticlesWithComments
+  fetchAllArticlesWithComments,
+  doesArticleExist,
+  doesTopicExist
 } = require("../models/articleModels");
+const { fetchUser } = require("../models/userModels");
 
 exports.getArticle = (req, res, next) => {
   const { article_id } = req.params;
@@ -54,8 +57,13 @@ exports.getArticleToCommentOn = (req, res, next) => {
 exports.getAllCommentsOnArticle = (req, res, next) => {
   const { article_id } = req.params;
   const { sort_by, order } = req.query;
-  fetchComments(article_id, sort_by, order)
-    .then(response => {
+  const promiseArray = [];
+  promiseArray.push(fetchComments(article_id, sort_by, order));
+  if (article_id) {
+    promiseArray.push(doesArticleExist(article_id));
+  }
+  return Promise.all(promiseArray)
+    .then(([response]) => {
       res.status(200).send({ comments: response });
     })
     .catch(err => {
@@ -65,8 +73,19 @@ exports.getAllCommentsOnArticle = (req, res, next) => {
 
 exports.getAllArticlesWithComments = (req, res, next) => {
   const { sort_by, order, author, topic } = req.query;
-  fetchAllArticlesWithComments(sort_by, order, author, topic)
-    .then(articles => {
+  const promiseArray = [];
+
+  promiseArray.push(
+    fetchAllArticlesWithComments(sort_by, order, author, topic)
+  );
+  if (author) {
+    promiseArray.push(fetchUser(author));
+  }
+  if (topic) {
+    promiseArray.push(doesTopicExist(topic));
+  }
+  return Promise.all(promiseArray)
+    .then(([articles, author, topic]) => {
       res.status(200).send({ articles });
     })
     .catch(next);

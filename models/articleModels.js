@@ -48,17 +48,17 @@ exports.fetchComments = (
     .select("comment_id", "votes", "created_at", "author", "body")
     .from("comments")
     .where("article_id", "=", article_id)
-    .orderBy(sort_by, order)
-    .then(comments => {
-      if (comments.length === 0) {
-        return Promise.all([comments, doesArticleExist(article_id)]);
-      } else {
-        return [comments];
-      }
-    })
-    .then(([comments]) => {
-      return comments;
-    });
+    .orderBy(sort_by, order);
+  // .then(comments => {
+  //   if (comments.length === 0) {
+  //     return Promise.all([comments, doesArticleExist(article_id)]);
+  //   } else {
+  //     return [comments];
+  //   }
+  // })
+  // .then(([comments]) => {
+  //   return comments;
+  // });
 };
 
 exports.fetchAllArticlesWithComments = (
@@ -90,24 +90,25 @@ exports.fetchAllArticlesWithComments = (
       }
     })
     .orderBy(sort, order)
-    .then(articles => {
-      if (articles.length === 0) {
-        if (author) {
-          return Promise.all([articles, fetchUser(author)]);
-        }
-        if (topic) {
-          return Promise.all([articles, doesTopicExist(topic)]);
-        }
-      } else {
-        return [articles];
-      }
-    })
-    .then(([articles]) => {
-      return articles;
-    });
+    .returning("*");
+  // .then(articles => {
+  //   if (articles.length === 0) {
+  //     if (author) {
+  //       return Promise.all([articles, fetchUser(author)]);
+  //     }
+  //     if (topic) {
+  //       return Promise.all([articles, doesTopicExist(topic)]);
+  //     }
+  //   } else {
+  //     return [articles];
+  //   }
+  // })
+  // .then(([articles]) => {
+  //   return articles;
+  // });
 };
 
-function doesArticleExist(article_id) {
+exports.doesArticleExist = article_id => {
   return connection
     .select("*")
     .from("articles")
@@ -121,9 +122,9 @@ function doesArticleExist(article_id) {
         });
       }
     });
-}
+};
 
-function doesTopicExist(topic) {
+exports.doesTopicExist = topic => {
   return connection
     .select("*")
     .from("topics")
@@ -137,4 +138,4 @@ function doesTopicExist(topic) {
         });
       }
     });
-}
+};
