@@ -2,9 +2,11 @@ const express = require("express");
 const app = express();
 const { psqlErrors, handle500, handle404s } = require("./errors");
 const apiRouter = require("./routes/apiRouter");
+const { error405 } = require("./errors");
+
 app.use(express.json());
 
-app.use("/api", apiRouter);
+app.use("/api", apiRouter).all(error405);
 
 app.use(psqlErrors);
 

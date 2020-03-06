@@ -1,5 +1,4 @@
 exports.psqlErrors = (err, req, res, next) => {
-  //console.log(err);
   if (err.code === "42703") {
     res
       .status(400)
@@ -16,12 +15,12 @@ exports.psqlErrors = (err, req, res, next) => {
       .send({ msg: "Status 400: Bad request - Invalid data type" });
   }
   if (err.code === "23503") {
-    res.status(400).send({ msg: "Status 400: Article does not exist" });
+    res.status(422).send({ msg: "Status 422: Item does not exist" });
   }
   if (err.code === "22003") {
     res.status(416).send({ msg: "Request range not satisfiable." });
   }
-  if (err.status === 404) {
+  if (err.status) {
     res.status(err.status).send({ msg: err.msg });
   } else next(err);
 };

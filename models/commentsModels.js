@@ -10,7 +10,17 @@ exports.patchVotesToComment = (comment_id, votes = 0) => {
         query.increment("votes", votes);
       }
     })
-    .returning("*");
+    .returning("*")
+    .then(patch => {
+      if (patch.length === 0) {
+        return Promise.reject({
+          status: 422,
+          msg: "Status 422: Item does not exist"
+        });
+      } else {
+        return patch;
+      }
+    });
 };
 
 exports.fetchDeleteComment = comment_id => {

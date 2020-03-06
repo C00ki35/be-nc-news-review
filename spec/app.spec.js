@@ -103,6 +103,15 @@ describe("USERS - GET", () => {
       });
   });
 
+  it("Status:405 - NOT FOUND / Valid path & username (50000) but not found", () => {
+    return request(app)
+      .put("/api/users/butter_bridge")
+      .expect(405);
+    // .then(({ body: { msg } }) => {
+    //   expect(msg).to.equal("Valid username but non existant.");
+    // });
+  });
+
   it("Status:405 - BAD METHOD / PUT/DELETE/PATCH - Incorrect method", () => {
     const incorrectMethods = ["put", "delete", "patch"];
     const methodPromises = incorrectMethods.map(method => {
@@ -286,7 +295,7 @@ describe("ARTICLES - PATCH", () => {
   });
 });
 
-describe("ARTICLES - POST", () => {
+describe("COMMENTS - POST", () => {
   it("Status:201 - Post a comment to article_id 1 - returns object with key of 'comment'", () => {
     return request(app)
       .post("/api/articles/1/comments")
@@ -320,33 +329,16 @@ describe("ARTICLES - POST", () => {
       });
   });
 
-  it("Status:400 - BAD REQUEST / Post to non-existant article", () => {
-    return request(app)
-      .post("/api/articles/800/comments")
-      .send({
-        username: "rogersop",
-        body: "This comment goes without saying..."
-      })
-      .expect(400)
-      .then(response => {
-        expect(response.body.msg).to.equal(
-          "Status 400: Article does not exist"
-        );
-      });
-  });
-
-  it("Status:400 - BAD REQUEST / username non-existant", () => {
+  it("Status:422 - UNPROCESSABLE ENTITY / username non-existant", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({
         username: "RogerRabbit",
         body: "This comment goes without saying..."
       })
-      .expect(400)
+      .expect(422)
       .then(response => {
-        expect(response.body.msg).to.equal(
-          "Status 400: Article does not exist"
-        );
+        expect(response.body.msg).to.equal("Status 422: Item does not exist");
       });
   });
 
@@ -367,10 +359,8 @@ describe("ARTICLES - POST", () => {
       .post("/api/articles/1/comments")
       .send({ body: "This won't work!" })
       .expect(400)
-      .then(response => {
-        expect(response.body.msg).to.equal(
-          "Status 400: Bad request - Invalid data type"
-        );
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Status 400: Bad request - Invalid data type");
       });
   });
 
@@ -381,6 +371,19 @@ describe("ARTICLES - POST", () => {
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).to.equal("Status 400: Bad request - Invalid data type");
+      });
+  });
+
+  it("Status:422 - UNPROCESSABLE ENTITY - /api/articles/10000/comments", () => {
+    return request(app)
+      .post("/api/articles/10000/comments")
+      .send({
+        username: "rogersop",
+        body: "This comment goes without saying..."
+      })
+      .expect(422)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Status 422: Item does not exist");
       });
   });
 
@@ -458,15 +461,6 @@ describe("ARTICLES/COMMENTS - GET", () => {
       });
   });
 
-  it("Status:404 - ARTICLE DOES NOT EXIST /api/articles/2/comments", () => {
-    return request(app)
-      .get("/api/articles/200/comments")
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).to.equal("Valid article number but not found.");
-      });
-  });
-
   it("Status:200 - Array of all comments for  article id 1 sorted by CREATED_AT DESC by default", () => {
     return request(app)
       .get("/api/articles/1/comments")
@@ -475,6 +469,15 @@ describe("ARTICLES/COMMENTS - GET", () => {
         expect(comments).to.be.sortedBy("created_at", {
           descending: true
         });
+      });
+  });
+
+  it("Status:404 - ARTICLE DOES NOT EXIST /api/articles/2/comments", () => {
+    return request(app)
+      .get("/api/articles/200/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Valid article number but not found.");
       });
   });
 
@@ -698,6 +701,16 @@ describe("COMMENTS - PATCH", () => {
       .expect(200)
       .then(({ body: { comment } }) => {
         expect(comment).to.contain.keys("votes", "article_id", "body");
+      });
+  });
+
+  it("Status:422 - UNPROCESSABLE ENTITY /api/comments/1000", () => {
+    return request(app)
+      .patch("/api/comments/1000")
+      .send({ inc_votes: -5 })
+      .expect(422)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Status 422: Item does not exist");
       });
   });
 
