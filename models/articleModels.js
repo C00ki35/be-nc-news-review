@@ -49,16 +49,6 @@ exports.fetchComments = (
     .from("comments")
     .where("article_id", "=", article_id)
     .orderBy(sort_by, order);
-  // .then(comments => {
-  //   if (comments.length === 0) {
-  //     return Promise.all([comments, doesArticleExist(article_id)]);
-  //   } else {
-  //     return [comments];
-  //   }
-  // })
-  // .then(([comments]) => {
-  //   return comments;
-  // });
 };
 
 exports.fetchAllArticlesWithComments = (
