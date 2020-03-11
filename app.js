@@ -6,7 +6,7 @@ const { error405 } = require("./errors");
 
 app.use(express.json());
 
-app.use("/api", apiRouter).all(error405);
+app.use("/api", apiRouter);
 
 app.use(psqlErrors);
 
