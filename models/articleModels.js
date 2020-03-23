@@ -57,7 +57,13 @@ exports.fetchAllArticlesWithComments = (
   author,
   topic
 ) => {
-  const sort = "articles." + sort_by;
+  let sort = "";
+  if (sort_by === "comment_count") {
+    sort = "comment_count";
+  } else {
+    sort = "articles." + sort_by;
+  }
+
   return connection
     .select(
       "articles.author",
@@ -81,21 +87,6 @@ exports.fetchAllArticlesWithComments = (
     })
     .orderBy(sort, order)
     .returning("*");
-  // .then(articles => {
-  //   if (articles.length === 0) {
-  //     if (author) {
-  //       return Promise.all([articles, fetchUser(author)]);
-  //     }
-  //     if (topic) {
-  //       return Promise.all([articles, doesTopicExist(topic)]);
-  //     }
-  //   } else {
-  //     return [articles];
-  //   }
-  // })
-  // .then(([articles]) => {
-  //   return articles;
-  // });
 };
 
 exports.doesArticleExist = article_id => {
