@@ -1,6 +1,12 @@
 const connection = require("../db/connection.js");
 const { fetchUser } = require("./userModels");
 
+exports.addArticle = article => {
+  return connection("articles")
+    .insert(article)
+    .returning("*");
+};
+
 exports.fetchArticle = article_id => {
   return connection
     .select(

@@ -7,13 +7,14 @@ const {
   getArticleToPatch,
   getArticleToCommentOn,
   getAllCommentsOnArticle,
-  getAllArticlesWithComments
+  getAllArticlesWithComments,
+  postArticle
 } = require("../controllers/articlesController");
 
 articlesRouter
-  .route("/:article_id")
-  .get(getArticle)
-  .patch(getArticleToPatch)
+  .post("/", postArticle)
+  .get("/:article_id", getArticle)
+  .patch("/:article_id", getArticleToPatch)
   .all(error405);
 
 articlesRouter

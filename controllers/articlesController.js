@@ -5,9 +5,17 @@ const {
   fetchComments,
   fetchAllArticlesWithComments,
   doesArticleExist,
-  doesTopicExist
+  doesTopicExist,
+  addArticle
 } = require("../models/articleModels");
 const { fetchUser } = require("../models/userModels");
+
+exports.postArticle = (req, res, next) => {
+  const article = req.body;
+  addArticle(article).then(addedArticle => {
+    res.status(201).send({ article: addedArticle[0] });
+  });
+};
 
 exports.getArticle = (req, res, next) => {
   const { article_id } = req.params;

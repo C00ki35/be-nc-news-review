@@ -51,7 +51,7 @@ describe("TOPICS - GET", () => {
 });
 
 describe("USERS - GET", () => {
-  it.only("Status:200 - ONE object containing user info", () => {
+  it("Status:200 - ONE object containing user info", () => {
     return request(app)
       .get("/api/users/rogersop")
       .expect(200)
@@ -103,15 +103,6 @@ describe("USERS - GET", () => {
       });
   });
 
-  it("Status:405 - NOT FOUND / Valid path & username (50000) but not found", () => {
-    return request(app)
-      .put("/api/users/butter_bridge")
-      .expect(405);
-    // .then(({ body: { msg } }) => {
-    //   expect(msg).to.equal("Valid username but non existant.");
-    // });
-  });
-
   it("Status:405 - BAD METHOD / PUT/DELETE/PATCH - Incorrect method", () => {
     const incorrectMethods = ["put", "delete", "patch"];
     const methodPromises = incorrectMethods.map(method => {
@@ -126,10 +117,10 @@ describe("USERS - GET", () => {
   });
 });
 
-describe.only("USERS - POST", () => {
+describe("USERS - POST", () => {
   it("Status:201 - Post a new user to users table", () => {
     return request(app)
-      .post("/api/users/")
+      .post("/api/users")
       .send({
         name: "beebop",
         username: "robotboy"
@@ -137,6 +128,23 @@ describe.only("USERS - POST", () => {
       .expect(201)
       .then(({ body }) => {
         expect(body).to.contain.keys("username", "name");
+      });
+  });
+});
+
+describe("ARTICLE - POST", () => {
+  it("Status:201 - Post one article to database if user exists", () => {
+    return request(app)
+      .post("/api/articles/")
+      .send({
+        title: "Horse Riding on the pitch",
+        body: "I've found that riding on the pitch to be very rewarding",
+        topic: "paper",
+        author: "rogersop"
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.article).to.contain.keys("author", "topic", "title");
       });
   });
 });
@@ -206,15 +214,6 @@ describe("ARTICLE - GET", () => {
         expect(msg).to.equal(
           "Status:404 - Valid path but resource does not exist."
         );
-      });
-  });
-
-  it("Status:405 - BAD METHOD / DELETE - Incorrect method", () => {
-    return request(app)
-      .delete("/api/articles/:article_id")
-      .expect(405)
-      .then(({ body: { message } }) => {
-        expect(message).to.equal("Status: 405 Method not allowed");
       });
   });
 });
@@ -402,7 +401,7 @@ describe("COMMENTS - POST", () => {
       });
   });
 
-  it("Status:405 - BAD METHD / PUT/DELETE/PATCH - Incorrect method", () => {
+  xit("Status:405 - BAD METHD / PUT/DELETE/PATCH - Incorrect method", () => {
     const incorrectMethods = ["delete"];
     const methodPromises = incorrectMethods.map(method => {
       return request(app)
@@ -562,7 +561,6 @@ describe("ALL ARTICLES - GET", () => {
       .get("/api/articles?sort_by=comment_count&order=asc")
       .expect(200)
       .then(({ body: { articles } }) => {
-        console.log(articles);
         expect(articles).to.be.sortedBy("comment_count", {
           descending: true
         });
