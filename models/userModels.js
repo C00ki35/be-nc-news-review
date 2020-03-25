@@ -18,7 +18,6 @@ exports.fetchUser = user_id => {
 };
 
 exports.addUserAccount = (name, username) => {
-  const user = { name: name, username: username };
   return connection("users")
     .insert({ name: name, username: username })
     .returning("*");
