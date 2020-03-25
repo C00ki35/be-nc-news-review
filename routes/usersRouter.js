@@ -1,11 +1,11 @@
 const express = require("express");
 const usersRouter = express.Router();
-const { getUser } = require("../controllers/usersController.js");
+const { getUser, addUser } = require("../controllers/usersController.js");
 const { error405 } = require("../errors.js");
 
 usersRouter
-  .route("/:user_id")
-  .get(getUser)
+  .post("/", addUser)
+  .get("/:user_id", getUser)
   .all(error405);
 
 module.exports = usersRouter;

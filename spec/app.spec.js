@@ -51,7 +51,7 @@ describe("TOPICS - GET", () => {
 });
 
 describe("USERS - GET", () => {
-  it("Status:200 - ONE object containing user info", () => {
+  it.only("Status:200 - ONE object containing user info", () => {
     return request(app)
       .get("/api/users/rogersop")
       .expect(200)
@@ -123,6 +123,21 @@ describe("USERS - GET", () => {
         });
     });
     return Promise.all(methodPromises);
+  });
+});
+
+describe.only("USERS - POST", () => {
+  it("Status:201 - Post a new user to users table", () => {
+    return request(app)
+      .post("/api/users/")
+      .send({
+        name: "beebop",
+        username: "robotboy"
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body).to.contain.keys("username", "name");
+      });
   });
 });
 
@@ -537,6 +552,18 @@ describe("ALL ARTICLES - GET", () => {
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles).to.be.sortedBy("title", {
+          descending: true
+        });
+      });
+  });
+
+  it("Status:200 - Array of all articles sorted by COMMENT COUNT", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        console.log(articles);
+        expect(articles).to.be.sortedBy("comment_count", {
           descending: true
         });
       });
