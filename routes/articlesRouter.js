@@ -8,11 +8,13 @@ const {
   getArticleToCommentOn,
   getAllCommentsOnArticle,
   getAllArticlesWithComments,
-  postArticle
+  postArticle,
+  delArticle
 } = require("../controllers/articlesController");
 
 articlesRouter
   .post("/", postArticle)
+  .delete("/:article_id", delArticle)
   .get("/:article_id", getArticle)
   .patch("/:article_id", getArticleToPatch)
   .all(error405);
