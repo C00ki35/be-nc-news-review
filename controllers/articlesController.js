@@ -6,7 +6,8 @@ const {
   fetchAllArticlesWithComments,
   doesArticleExist,
   doesTopicExist,
-  addArticle
+  addArticle,
+  deleteArticle
 } = require("../models/articleModels");
 const { fetchUser } = require("../models/userModels");
 
@@ -14,6 +15,13 @@ exports.postArticle = (req, res, next) => {
   const article = req.body;
   addArticle(article).then(addedArticle => {
     res.status(201).send({ article: addedArticle[0] });
+  });
+};
+
+exports.delArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  deleteArticle(article_id).then(deleted => {
+    res.sendStatus(204);
   });
 };
 

@@ -149,6 +149,14 @@ describe("ARTICLE - POST", () => {
   });
 });
 
+describe("ARTICLE - DELETE an article", () => {
+  it.only("Status:204 - Delete an article", () => {
+    return request(app)
+      .delete("/api/articles/4")
+      .expect(204);
+  });
+});
+
 describe("ARTICLE - GET", () => {
   it("Status:200 - ONE object with a key of 'article'", () => {
     return request(app)
