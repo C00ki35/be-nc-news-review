@@ -117,33 +117,77 @@ describe("USERS - GET", () => {
   });
 });
 
-describe("USERS - POST", () => {
-  it("Status:201 - Post a new user to users table", () => {
+describe("USERS - GET FROM LOGIN", () => {
+  it.only("Status:200 - Post a new user to users table", () => {
     return request(app)
-      .post("/api/users")
+      .post("/api/details")
       .send({
-        name: "beebop",
-        username: "robotboy",
-        password: "helloMum"
+        username: "rogersop",
+        password: "password"
       })
-      .expect(201)
+      .expect(200)
       .then(({ body }) => {
-        expect(body).to.contain.keys("username", "name");
+        expect(body.user).to.contain.keys("username");
+      });
+  });
+
+  it("Status:404 - Username does not exit", () => {
+    return request(app)
+      .get("/api/details")
+      .send({
+        username: "ersop",
+        password: "password"
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Username does not exist.");
       });
   });
 });
 
-it("Status:201 - Return 'Username already exists'", () => {
-  return request(app)
-    .post("/api/users")
-    .send({
-      name: "beebop",
-      username: "rogersop"
-    })
-    .expect(409)
-    .then(({ body: { msg } }) => {
-      expect(msg).to.equal("Username already exists");
-    });
+describe("USERS - POST a new user to database", () => {
+  it("Status:201 - Post a new user to users table", () => {
+    return request(app)
+      .post("/api/details/user")
+      .send({
+        name: "paul",
+        username: "archienorman",
+        avatar_url: "http://image.jpg",
+        password: "password"
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.user).to.contain.keys("username", "avatar_url");
+      });
+  });
+
+  it("Status:422 - Username already exists", () => {
+    return request(app)
+      .post("/api/details/user")
+      .send({
+        name: "paul",
+        username: "rogersop",
+        avatar_url: "http://image.jpg",
+        password: "password"
+      })
+      .expect(422)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Sorry, username exists.");
+      });
+  });
+
+  it("Status:404 - Username does not exit", () => {
+    return request(app)
+      .get("/api/details")
+      .send({
+        username: "ersop",
+        password: "password"
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal("Username does not exist.");
+      });
+  });
 });
 
 describe("ARTICLE - POST", () => {

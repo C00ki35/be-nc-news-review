@@ -4,8 +4,8 @@ exports.getUserDetails = (req, res, next) => {
   const { username, password } = req.body;
   fetchUserDetails(username, password)
     .then(user => {
-      const { username } = user[0];
-      res.status(200).send({ user: { username } });
+      const { username, avatar_url } = user[0];
+      res.status(200).send({ user: { username, avatar_url } });
     })
     .catch(err => {
       next(err);

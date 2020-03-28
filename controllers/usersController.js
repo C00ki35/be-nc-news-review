@@ -1,9 +1,6 @@
-const {
-  fetchUser,
-  addUserAccount,
-  doesUsernameExist
-} = require("../models/userModels");
+const { fetchUser } = require("../models/userModels");
 
+//THIS DEALS WITH API REQUEST FOR USERNAME
 exports.getUser = (req, res, next) => {
   const { user_id } = req.params;
   fetchUser(user_id)
@@ -12,14 +9,12 @@ exports.getUser = (req, res, next) => {
       res.status(200).send({ user: { username, avatar_url, name } });
     })
     .catch(err => {
-      console.log(err);
       next(err);
     });
 };
 
 exports.addUser = (req, res, next) => {
   const { name, username, password } = req.body;
-  console.log("GETTNG HERE");
   return Promise.all([
     addUserAccount(name, username, password),
     doesUsernameExist(username)

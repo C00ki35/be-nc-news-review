@@ -8,7 +8,7 @@ const {
 } = require("../controllers/detailsController");
 
 detailsRouter
-  .get("/", getUserDetails)
+  .post("/", getUserDetails)
   .post("/user", addNewUser)
   .all(error405);
 
