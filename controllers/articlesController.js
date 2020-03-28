@@ -104,5 +104,7 @@ exports.getAllArticlesWithComments = (req, res, next) => {
     .then(([articles, author, topic]) => {
       res.status(200).send({ articles });
     })
-    .catch(next);
+    .catch(err => {
+      next(err);
+    });
 };

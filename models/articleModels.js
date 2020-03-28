@@ -13,6 +13,7 @@ exports.deleteArticle = article_id => {
     .where("article_id", article_id)
     .returning("*");
 };
+
 exports.fetchArticle = article_id => {
   return connection
     .select(

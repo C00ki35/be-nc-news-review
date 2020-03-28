@@ -16,9 +16,15 @@ exports.fetchUser = user_id => {
       }
     });
 };
-
-exports.addUserAccount = (name, username) => {
+exports.addUserAccount = (name, username, password) => {
   return connection("users")
-    .insert({ name: name, username: username })
+    .insert({ name: name, username: username, password: password })
+    .returning("*");
+};
+
+exports.doesUsernameExist = username => {
+  return connection("users")
+    .select("*")
+    .where("username", username)
     .returning("*");
 };

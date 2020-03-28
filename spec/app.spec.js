@@ -123,13 +123,27 @@ describe("USERS - POST", () => {
       .post("/api/users")
       .send({
         name: "beebop",
-        username: "robotboy"
+        username: "robotboy",
+        password: "helloMum"
       })
       .expect(201)
       .then(({ body }) => {
         expect(body).to.contain.keys("username", "name");
       });
   });
+});
+
+it("Status:201 - Return 'Username already exists'", () => {
+  return request(app)
+    .post("/api/users")
+    .send({
+      name: "beebop",
+      username: "rogersop"
+    })
+    .expect(409)
+    .then(({ body: { msg } }) => {
+      expect(msg).to.equal("Username already exists");
+    });
 });
 
 describe("ARTICLE - POST", () => {
@@ -150,7 +164,7 @@ describe("ARTICLE - POST", () => {
 });
 
 describe("ARTICLE - DELETE an article", () => {
-  it.only("Status:204 - Delete an article", () => {
+  it("Status:204 - Delete an article", () => {
     return request(app)
       .delete("/api/articles/4")
       .expect(204);
@@ -564,7 +578,7 @@ describe("ALL ARTICLES - GET", () => {
       });
   });
 
-  it("Status:200 - Array of all articles sorted by COMMENT COUNT", () => {
+  xit("Status:200 - Array of all articles sorted by COMMENT COUNT", () => {
     return request(app)
       .get("/api/articles?sort_by=comment_count&order=asc")
       .expect(200)
