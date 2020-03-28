@@ -118,7 +118,7 @@ describe("USERS - GET", () => {
 });
 
 describe("USERS - GET FROM LOGIN", () => {
-  it.only("Status:200 - Post a new user to users table", () => {
+  it("Status:200 - Post a new user to users table", () => {
     return request(app)
       .post("/api/details")
       .send({
@@ -146,7 +146,7 @@ describe("USERS - GET FROM LOGIN", () => {
 });
 
 describe("USERS - POST a new user to database", () => {
-  it("Status:201 - Post a new user to users table", () => {
+  it.only("Status:201 - Post a new user to users table", () => {
     return request(app)
       .post("/api/details/user")
       .send({
